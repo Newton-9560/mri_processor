@@ -1,16 +1,15 @@
 import numpy as np
 
+
 def get_name(s):
     last_slash_index = s.rfind('/')
     nii_index = s.find('.nii', last_slash_index)
 
     if last_slash_index != -1 and nii_index != -1:
-        return s[last_slash_index + 1:nii_index-3]
+        return s[last_slash_index + 1:nii_index - 3]
     else:
         raise ValueError("This is not a nii file!")
-    
-def get_t2w_path(s):
-    return s.replace('T1w', 'T2w')
+
 
 def get_slice(img, direction, index):
     if direction == 2:

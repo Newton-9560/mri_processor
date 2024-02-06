@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
+
 # Function to load and display images from two folders
 def display_images_with_filenames(folder1, folder2):
     # Get the list of files in each folder
@@ -23,8 +24,8 @@ def display_images_with_filenames(folder1, folder2):
 
     # Create the figure and axes
     fig, ax = plt.subplots(1, 2)
-    img1 = ax[0].imshow(plt.imread(os.path.join(folder1, files1[0])),'gray')
-    img2 = ax[1].imshow(plt.imread(os.path.join(folder2, files2[0])),'gray')
+    img1 = ax[0].imshow(plt.imread(os.path.join(folder1, files1[0])), 'gray')
+    img2 = ax[1].imshow(plt.imread(os.path.join(folder2, files2[0])), 'gray')
 
     # Set titles with filenames
     title1 = ax[0].set_title(files1[0])
