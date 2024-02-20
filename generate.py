@@ -1,4 +1,4 @@
-from convert import DatasetGenerator, get_t2w_path
+from convert import DatasetGenerator, get_t2w_path, Dataset3DGenerator
 
 
 def convert_name(name):
@@ -6,9 +6,15 @@ def convert_name(name):
 
 
 if __name__ == '__main__':
-    dataset_generator = DatasetGenerator('./data/mri', get_t2w_path)
-    # dataset_generator.file_preprocess(convert_name)
-    # dataset_generator.get_t1w_path()
-    # dataset_generator.t1w_path = ['./data/mri/sub-CC00149XX18_ses-49000_desc-restore_T1w.nii.gz']
+    dataset_generator = Dataset3DGenerator('./data/mri', get_t2w_path)
+    train, test = dataset_generator.get_t1w_path()
 
-    dataset_generator.generate_dataset('./dataset/train/')
+    dataset_generator.generate_dataset(train, './dataset/dataset3D/train/',
+                                       preserving_ratio=0.8,
+                                       patch_size=(32, 32, 32),
+                                       stride=(32, 32, 32))
+    dataset_generator.generate_dataset(test, './dataset/dataset3D/test/',
+                                       preserving_ratio=0.8,
+                                       patch_size=(32, 32, 32),
+                                       stride=(32, 32, 32))
+    # dataset_generator.generate_dataset(test, './dataset/test/')

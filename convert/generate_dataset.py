@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import os
 import nibabel as nib
@@ -18,8 +19,6 @@ class DatasetGenerator:
         :param source_root: Directory containing the source MRI files.
         :param get_t2w_path_from_t1w: Function to derive the path of a T2-weighted image given a T1-weighted image path.
         """
-        self.t1w_path = None
-        self.t1w_path = None
 
         self.source_root = source_root
         self.get_t2w_path = get_t2w_path_from_t1w
@@ -45,20 +44,28 @@ class DatasetGenerator:
             if t in f:
                 os.rename(self.get_path(f), convert_name(self.get_path(f)))
 
-    def get_t1w_path(self, ignore_unpair=True):
+    def get_t1w_path(self, ignore_unpaired=True, ratio=0.8, shuffle=True):
         """
         Populates the list of T1-weighted image paths that have corresponding T2-weighted images.
 
-        :param ignore_unpair: If True, ignores T1w images without a corresponding T2w image.
+        :param shuffle: shuffle the data or not
+        :param ratio: the ratio of the training dataset and test dataset
+        :param ignore_unpaired: If True, ignores T1w images without a corresponding T2w image.
         """
         t1w_path = []
         for f in os.listdir(self.source_root):
             if 'T1w' in f and os.path.exists(self.get_path(self.get_t2w_path(f))):
                 t1w_path.append(self.get_path(f))
 
-        self.t1w_path = t1w_path
+        if shuffle:
+            random.shuffle(t1w_path)
+        if 0 < ratio < 1:
+            split_index = int(len(t1w_path) * ratio)
+            return t1w_path[:split_index], t1w_path[split_index:]
+        else:
+            return t1w_path
 
-    def generate_dataset(self, dataset_root, directions=None,
+    def generate_dataset(self, t1w_path, dataset_root, directions=None,
                          preserving_ratio=0.4):
         """
         Generates and saves slices from T1w and T2w images as individual PNG files.
@@ -67,8 +74,6 @@ class DatasetGenerator:
         :param directions: List of directions (axes) along which to slice the images. Defaults to [0, 1, 2].
         :param preserving_ratio: The minimum ratio of non-zero pixels in a slice for it to be saved.
         """
-        if self.t1w_path is None:
-            self.get_t1w_path()
 
         if directions is None:
             directions = [0, 1, 2]
@@ -83,7 +88,7 @@ class DatasetGenerator:
 
         count = 0
         for direction in directions:
-            for t1w_nii_path in self.t1w_path:
+            for t1w_nii_path in t1w_path:
                 img_t1w = nib.load(t1w_nii_path)
                 img_t2w = nib.load(self.get_t2w_path(t1w_nii_path))
                 if img_t2w.shape != img_t1w.shape:
